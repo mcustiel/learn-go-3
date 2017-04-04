@@ -5,30 +5,21 @@ import (
 
 	"os"
 
+	"github.com/mcustiel/game/factory"
 	"github.com/mcustiel/game/input"
-	"github.com/veandco/go-sdl2/sdl"
 )
-
-var winTitle string = "Go-SDL2 Events"
-var winWidth, winHeight int = 800, 600
 
 func main() {
 	fmt.Println("Hello world")
 
-	var window *sdl.Window
-
-	var err error
-
-	sdl.Init(sdl.INIT_EVERYTHING)
-
-	window, err = sdl.CreateWindow(winTitle, sdl.WINDOWPOS_UNDEFINED,
-		sdl.WINDOWPOS_UNDEFINED,
-		winWidth, winHeight,
-		sdl.WINDOW_SHOWN)
+	renderer := factory.CreateRenderer()
+	game := factory.CreateGameLogic()
+	err := renderer.Init()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to create window: %s\n", err)
-		os.Exit(1)
+		panic(err)
 	}
+
 	var play = true
 	for play {
 		keyboardState := input.KeyboardState()
@@ -39,8 +30,10 @@ func main() {
 			}
 			fmt.Println(keyboardState.Code())
 		}
+		renderer.Render(game)
 		//fmt.Println(keyboardState.key)
 	}
+
 	//	fmt.Println("Hello world")
 	//	os.Exit(0)
 	//	var gameLoader gameLoader.GameLoader = factory.GetGameLoader()
@@ -64,5 +57,5 @@ func main() {
 	//		game.applyGameLogic(gameState)
 	//		renderer.render(gameState)
 	//	}
-	defer window.Destroy()
+
 }

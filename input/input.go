@@ -1,10 +1,10 @@
 package input
 
-const CODE_EXIT = 0
-const CODE_JUMP = 1
-const CODE_RIGHT = 2
-const CODE_LEFT = 3
-const CODE_INVALID = 4
+const CODE_EXIT byte = 0
+const CODE_JUMP byte = 1
+const CODE_RIGHT byte = 2
+const CODE_LEFT byte = 3
+const CODE_INVALID byte = 4
 
 type Input struct {
 	key byte

@@ -7,7 +7,10 @@ package factory
 // "configLoader"
 //"fileGameLoader"
 //"game"
-//"sdlRenderer"
+import "github.com/mcustiel/game/render"
+
+import "github.com/mcustiel/game/logic"
+
 //"simpleCollisionHandler"
 //"simplePhysics"
 
@@ -15,9 +18,9 @@ package factory
 //	return fileGameLoader.create(GetConfig()["gameConfigPath"])
 //}
 
-//func GetGameLogic() {
-//	return game.createGameLogic()
-//}
+func CreateGameLogic() *logic.Game {
+	return logic.CreateGameState()
+}
 
 //func GetPhysics() {
 //	return simplePhysics.create()
@@ -27,9 +30,9 @@ package factory
 //	return simpleCollisionHandler.create()
 //}
 
-//func GetRenderer() {
-//	return sdlRenderer.create()
-//}
+func CreateRenderer() render.Renderer {
+	return render.Create()
+}
 
 //func GetConfig() {
 //	config := make(map[string]string)
