@@ -7,29 +7,47 @@ const CODE_LEFT byte = 3
 const CODE_INVALID byte = 4
 
 type Input struct {
-	key byte
+	jump    bool
+	right   bool
+	left    bool
+	invalid bool
+	exit    bool
 }
 
 type GameInput interface {
 	IsExit() bool
 	IsValid() bool
-	Code() Input
-}
-
-func NewInput(c byte) *Input {
-	input := new(Input)
-	input.key = c
-	return input
+	JumpPressed() bool
+	LeftPressed() bool
+	RightPressed() bool
 }
 
 func (inputData Input) IsExit() bool {
-	return inputData.key == CODE_EXIT
+	return inputData.exit
 }
 
 func (inputData Input) IsValid() bool {
-	return inputData.key != CODE_INVALID
+	return !inputData.invalid
 }
 
-func (inputData Input) Code() byte {
-	return inputData.key
+func (inputData Input) JumpPressed() bool {
+	return inputData.jump
+}
+
+func (inputData Input) LeftPressed() bool {
+	return inputData.left
+}
+
+func (inputData Input) RightPressed() bool {
+	return inputData.right
+}
+
+func NewInput() *Input {
+	input := new(Input)
+	input.invalid = false
+	input.exit = false
+	input.jump = false
+	input.left = false
+	input.right = false
+	return input
 }

@@ -7,6 +7,7 @@ import (
 
 	"github.com/mcustiel/game/factory"
 	"github.com/mcustiel/game/input"
+	"github.com/mcustiel/game/physics"
 )
 
 func main() {
@@ -21,18 +22,20 @@ func main() {
 	}
 
 	var play = true
-	for play {
+	for renderer.Render(game); play; {
 		keyboardState := input.KeyboardState()
 
+		game.ApplyInput(keyboardState)
 		if keyboardState != nil {
 			if keyboardState.IsExit() {
 				play = false
 			}
-			fmt.Println(keyboardState.Code())
 		}
+
+		physics.Apply(game)
 		renderer.Render(game)
-		//fmt.Println(keyboardState.key)
 	}
+	renderer.Terminate()
 
 	//	fmt.Println("Hello world")
 	//	os.Exit(0)

@@ -22,10 +22,6 @@ func CreateGameLogic() *logic.Game {
 	return logic.CreateGameState()
 }
 
-//func GetPhysics() {
-//	return simplePhysics.create()
-//}
-
 //func GetCollisionHandler() {
 //	return simpleCollisionHandler.create()
 //}
