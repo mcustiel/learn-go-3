@@ -53,7 +53,7 @@ func (game *Game) applyLogic() {
 	println("Character speedY", game.character.speedY)
 	applyLevelLogic(game)
 
-	//	for i := 0; i < collitionsFound; i++ {
+	//	for i := 0; i < collisionsFound; i++ {
 	//		switch (collidingTypes[i]) {
 	//		}
 	//	}

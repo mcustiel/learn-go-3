@@ -2,12 +2,12 @@ package logic
 
 import "math"
 
-type CollitionDirection int8
+type CollisionDirection int8
 
 const (
-	DIRECTION_BOTH       CollitionDirection = 0
-	DIRECTION_VERTICAL   CollitionDirection = -1
-	DIRECTION_HORIZONTAL CollitionDirection = 1
+	DIRECTION_BOTH       CollisionDirection = 0
+	DIRECTION_VERTICAL   CollisionDirection = -1
+	DIRECTION_HORIZONTAL CollisionDirection = 1
 )
 
 type PhysicObject interface {

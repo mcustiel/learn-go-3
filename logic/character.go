@@ -49,7 +49,7 @@ func applyCharacterLogic(game *Game) {
 	}
 
 	var collidingBlocks map[int]*Block = make(map[int]*Block)
-	var collitionsFound int = 0
+	var collisionsFound int = 0
 	var collidesH, collidesV bool = false, false
 
 	for xLevel := 0; xLevel < LOGICAL_WIDTH; xLevel++ {
@@ -57,7 +57,7 @@ func applyCharacterLogic(game *Game) {
 			block := game.level[yLevel][xLevel]
 			if block != nil && block.Collides(newX, newY, game.character.width, game.character.height) {
 				println("Character collides with block ", block.id, block.posY)
-				collidingBlocks[collitionsFound] = block
+				collidingBlocks[collisionsFound] = block
 
 				if block.Collides(newX, game.character.posY, game.character.width, game.character.height) {
 					if game.character.speedX > 0 {
@@ -76,7 +76,7 @@ func applyCharacterLogic(game *Game) {
 					collidesV = true
 				}
 
-				collitionsFound++
+				collisionsFound++
 			}
 		}
 	}

@@ -58,11 +58,11 @@ func (entity Entity) Collides(X int, Y int, W int, H int) bool {
 	return collidesX && collidesY
 }
 
-func (object Entity) collitionDirection(X int, Y int) CollitionDirection {
+func (object Entity) collisionDirection(X int, Y int) CollisionDirection {
 	distX := math.Abs(float64(object.posX - X))
 	distY := math.Abs(float64(object.posY - Y))
 
-	var direction CollitionDirection
+	var direction CollisionDirection
 	if distX > distY {
 		direction = DIRECTION_HORIZONTAL
 	} else if distY > distX {
