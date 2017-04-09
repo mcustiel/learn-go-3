@@ -66,7 +66,8 @@ func applyBlockLogic(block *Block, game *Game) {
 								newX = otherBlock.posX + otherBlock.width
 							}
 							collidesH = true
-						} else {
+						}
+						if otherBlock.Collides(block.posX, newY, block.width, block.height) {
 							if block.speedY > 0 {
 								newY = otherBlock.posY - block.height
 							} else {

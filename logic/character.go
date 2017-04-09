@@ -37,7 +37,18 @@ func applyCharacterLogic(game *Game) {
 	game.character.speedY = AccelerateY(game.character)
 
 	var newX, newY int = GetNewPosition(game.character)
-	var collidingTypes []BlockType = make([]BlockType, 8, 8)
+	if newX < 0 {
+		newX = 0
+	} else if newX > LOGICAL_WIDTH*BLOCK_WIDTH_PIXELS {
+		newX = (LOGICAL_WIDTH * BLOCK_WIDTH_PIXELS) - game.character.width
+	}
+	if newY < 0 {
+		newY = 0
+	} else if newY > LOGICAL_HEIGHT*BLOCK_HEIGHT_PIXELS {
+		newX = (LOGICAL_HEIGHT * BLOCK_HEIGHT_PIXELS) - game.character.height
+	}
+
+	var collidingBlocks map[int]*Block = make(map[int]*Block)
 	var collitionsFound int = 0
 	var collidesH, collidesV bool = false, false
 
@@ -46,7 +57,7 @@ func applyCharacterLogic(game *Game) {
 			block := game.level[yLevel][xLevel]
 			if block != nil && block.Collides(newX, newY, game.character.width, game.character.height) {
 				println("Character collides with block ", block.id, block.posY)
-				collidingTypes[collitionsFound] = block.blockType
+				collidingBlocks[collitionsFound] = block
 
 				if block.Collides(newX, game.character.posY, game.character.width, game.character.height) {
 					if game.character.speedX > 0 {
@@ -55,7 +66,8 @@ func applyCharacterLogic(game *Game) {
 						newX = block.posX + block.width
 					}
 					collidesH = true
-				} else {
+				}
+				if block.Collides(game.character.posX, newY, game.character.width, game.character.height) {
 					if game.character.speedY > 0 {
 						newY = block.posY - game.character.height
 					} else {
