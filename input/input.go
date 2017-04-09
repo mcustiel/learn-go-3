@@ -14,7 +14,7 @@ type Input struct {
 	exit    bool
 }
 
-type GameInput interface {
+type InputStateAccessor interface {
 	IsExit() bool
 	IsValid() bool
 	JumpPressed() bool

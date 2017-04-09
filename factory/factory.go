@@ -1,37 +1,14 @@
 package factory
 
-//func dummy() {
-
-//}
-
-// "configLoader"
-//"fileGameLoader"
-//"game"
-import "github.com/mcustiel/game/render"
-
-import "github.com/mcustiel/game/logic"
-
-//"simpleCollisionHandler"
-//"simplePhysics"
-
-//func GetGameLoader() {
-//	return fileGameLoader.create(GetConfig()["gameConfigPath"])
-//}
+import (
+	"github.com/mcustiel/game/logic"
+	"github.com/mcustiel/game/render"
+)
 
 func CreateGameLogic() *logic.Game {
-	return logic.CreateGameState()
+	return logic.NewGame(CreateRenderer())
 }
-
-//func GetCollisionHandler() {
-//	return simpleCollisionHandler.create()
-//}
 
 func CreateRenderer() render.Renderer {
-	return render.Create()
+	return render.NewSdlRenderer()
 }
-
-//func GetConfig() {
-//	config := make(map[string]string)
-//	config["gameConfigPath"] = "config"
-//	return config
-//}

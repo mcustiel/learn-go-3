@@ -1,101 +1,82 @@
 package render
 
 import "github.com/veandco/go-sdl2/sdl"
-import "github.com/mcustiel/game/logic"
 
-type SdlObjects [][]*sdl.Rect
+type SdlObjects map[int]*sdl.Rect
 
 type SdlDisplay struct {
 	window          *sdl.Window
-	initialized     bool
 	renderer        *sdl.Renderer
 	characterObject *sdl.Rect
 	sdlObjects      SdlObjects
+	worldWidth      int
 }
 
-func Create() *SdlDisplay {
+type SdlScreen struct {
+	xPos       int
+	sdlObjects SdlObjects
+	renderer   *sdl.Renderer
+}
+
+func NewSdlRenderer() *SdlDisplay {
 	renderer := new(SdlDisplay)
-	renderer.initialized = false
+
 	return renderer
 }
 
-func (display *SdlDisplay) Render(game *logic.Game) {
-	display.renderer.SetDrawColor(0x33, 0x33, 0x33, 0xFF)
-	display.renderer.Clear()
-	renderLevelSection(display, game.Level, getRenderStartX(game.Character), getRenderEndX(game.Character))
-	renderCharacter(display, game.Character)
-	display.renderer.Present()
-	sdl.Delay(uint32(1000 / 48))
-}
-
-func renderLevelSection(display *SdlDisplay, level logic.Level, xStart int, xEnd int) {
-	for x := xStart; x < xEnd; x++ {
-		for y := 0; y < 12; y++ {
-			block := level[y][x]
-			if block != nil {
-				renderBlock(display, block, x, y)
-			}
-		}
-	}
-}
-
-func renderBlock(display *SdlDisplay, block *logic.Block, x int, y int) {
-	if display.sdlObjects[y][x] == nil {
-		rect := sdl.Rect{int32(block.PositionX()),
-			int32(block.PositionY()),
-			int32(block.Width()),
-			int32(block.Height())}
-		display.sdlObjects[y][x] = &rect
+func (display *SdlDisplay) Screen(xCenter int) Screen {
+	screen := new(SdlScreen)
+	screen.renderer = display.renderer
+	screen.sdlObjects = display.sdlObjects
+	if xCenter < WINDOWS_WIDTH/2 {
+		screen.xPos = 0
+	} else if xCenter > display.worldWidth-WINDOWS_WIDTH/2 {
+		screen.xPos = display.worldWidth - WINDOWS_WIDTH
 	} else {
-		display.sdlObjects[y][x].X = int32(block.PositionX())
-		display.sdlObjects[y][x].Y = int32(block.PositionY())
+		screen.xPos = xCenter - WINDOWS_WIDTH/2
 	}
-	display.renderer.SetDrawColor(255, 245, 235, 255)
-	display.renderer.DrawRect(display.sdlObjects[y][x])
+	return screen
 }
 
-func getRenderEndX(character *logic.Character) int {
-	xEnd := character.PositionX()/logic.BLOCK_WIDTH_PIXELS + 8
-	if xEnd >= logic.LOGICAL_WIDTH {
-		xEnd = logic.LOGICAL_WIDTH - 1
-	}
-	if xEnd < 16 {
-		xEnd = 16
-	}
-	return xEnd
+func (screen SdlScreen) Start() {
+	screen.renderer.SetDrawColor(0x33, 0x33, 0x33, 0xFF)
+	screen.renderer.Clear()
 }
 
-func getRenderStartX(character *logic.Character) int {
-	xStart := character.PositionX()/logic.BLOCK_WIDTH_PIXELS - 8
-	if xStart < 0 {
-		xStart = 0
-	}
-	if xStart >= logic.LOGICAL_WIDTH-16 {
-		xStart = logic.LOGICAL_WIDTH - 16
-	}
-	return xStart
+func (screen SdlScreen) End() {
+	screen.renderer.Present()
+	sdl.Delay(uint32(1000 / FRAME_RATE))
 }
 
-func renderCharacter(display *SdlDisplay, character *logic.Character) {
-	if display.characterObject == nil {
-		rect := sdl.Rect{int32(character.PositionX()),
-			int32(character.PositionY()),
-			int32(character.Width()),
-			int32(character.Height())}
-		display.characterObject = &rect
+func (screen SdlScreen) Draw(renderable Renderable) {
+	if renderable.PositionX() > screen.xPos+WINDOWS_WIDTH {
+
+		return
+	}
+	if renderable.PositionX()+renderable.Width() < screen.xPos {
+		return
+	}
+	if screen.sdlObjects[renderable.UniqueId()] == nil {
+		rect := sdl.Rect{int32(renderable.PositionX() - screen.xPos),
+			int32(renderable.PositionY()),
+			int32(renderable.Width()),
+			int32(renderable.Height())}
+		screen.sdlObjects[renderable.UniqueId()] = &rect
 	} else {
-		display.characterObject.X = int32(character.PositionX())
-		display.characterObject.Y = int32(character.PositionY())
+		screen.sdlObjects[renderable.UniqueId()].X = int32(renderable.PositionX() - screen.xPos)
+		screen.sdlObjects[renderable.UniqueId()].Y = int32(renderable.PositionY())
 	}
-	display.renderer.SetDrawColor(uint8(255), uint8(245), uint8(235), 255)
-	display.renderer.DrawRect(display.characterObject)
+
+	screen.renderer.SetDrawColor(255, 245, 235, 255)
+	screen.renderer.DrawRect(screen.sdlObjects[renderable.UniqueId()])
 }
 
-func (display *SdlDisplay) Init() error {
+func (display *SdlDisplay) Init(worldWidth int) error {
 	var err error
 
 	sdl.Init(sdl.INIT_EVERYTHING)
 
+	display.worldWidth = worldWidth
 	display.window, err = sdl.CreateWindow(WINDOW_TITLE, sdl.WINDOWPOS_UNDEFINED,
 		sdl.WINDOWPOS_UNDEFINED,
 		WINDOWS_WIDTH, WINDOWS_HEIGHT,
@@ -106,11 +87,7 @@ func (display *SdlDisplay) Init() error {
 	}
 
 	display.renderer, err = sdl.CreateRenderer(display.window, -1, sdl.RENDERER_ACCELERATED)
-	display.initialized = true
-	display.sdlObjects = make([][]*sdl.Rect, 12, 12)
-	for i := 0; i < 12; i++ {
-		display.sdlObjects[i] = make([]*sdl.Rect, 100, 100)
-	}
+	display.sdlObjects = make(SdlObjects)
 
 	return err
 }
