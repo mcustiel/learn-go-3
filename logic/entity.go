@@ -1,7 +1,5 @@
 package logic
 
-import "math"
-
 type Entity struct {
 	posX          int
 	posY          int
@@ -12,6 +10,7 @@ type Entity struct {
 	width         int
 	height        int
 	friction      int
+	solid         bool
 }
 
 func (entity Entity) Friction() int {
@@ -58,17 +57,42 @@ func (entity Entity) Collides(X int, Y int, W int, H int) bool {
 	return collidesX && collidesY
 }
 
-func (object Entity) collisionDirection(X int, Y int) CollisionDirection {
-	distX := math.Abs(float64(object.posX - X))
-	distY := math.Abs(float64(object.posY - Y))
-
-	var direction CollisionDirection
-	if distX > distY {
-		direction = DIRECTION_HORIZONTAL
-	} else if distY > distX {
-		direction = DIRECTION_VERTICAL
-	} else {
-		direction = DIRECTION_BOTH
+func (object Entity) GetNextX() int {
+	var newX int = object.posX + object.speedX
+	if newX < 0 {
+		newX = 0
+	} else if newX > LOGICAL_WIDTH*BLOCK_WIDTH_PIXELS-object.width {
+		newX = (LOGICAL_WIDTH * BLOCK_WIDTH_PIXELS) - object.width
 	}
-	return direction
+	return newX
+}
+
+func (object Entity) GetNextY() int {
+	var newY int = object.posY + object.speedY
+	if newY < 0 {
+		newY = 0
+	} else if newY > LOGICAL_HEIGHT*BLOCK_HEIGHT_PIXELS-object.height {
+		newY = (LOGICAL_HEIGHT * BLOCK_HEIGHT_PIXELS) - object.height
+	}
+	return newY
+}
+
+func (object Entity) GetHorizontalPositionNextTo(otherObject PhysicObject) int {
+	var newX int
+	if object.SpeedX() > 0 {
+		newX = otherObject.PositionX() - object.Width()
+	} else {
+		newX = otherObject.PositionX() + otherObject.Width()
+	}
+	return newX
+}
+
+func (object Entity) GetVerticalPositionNextTo(otherObject PhysicObject) int {
+	var newY int
+	if object.SpeedY() > 0 {
+		newY = otherObject.PositionY() - object.Height()
+	} else {
+		newY = otherObject.PositionY() + otherObject.Height()
+	}
+	return newY
 }

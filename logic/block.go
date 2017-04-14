@@ -47,45 +47,20 @@ func applyBlockLogic(block *Block, game *Game) {
 	if distance, _ := Distance(block, game.character); BlockType(block.Type()) == BLOCK_TYPE_FALLING_ROCK && distance < 75 {
 		block.accelerationY = 1
 	}
+
 	block.speedX = AccelerateX(block)
 	block.speedY = AccelerateY(block)
 
 	if block.speedX != 0 || block.speedY != 0 {
-		var newX, newY int = GetNewPosition(block)
-		var collidesH, collidesV bool = false, false
+		var collisionInfo CollisionInformation = GetCollisionInformation(block.Entity, game.level)
 
-		for xLevel := 0; xLevel < LOGICAL_WIDTH; xLevel++ {
-			for yLevel := 0; yLevel < LOGICAL_HEIGHT; yLevel++ {
-				otherBlock := game.level[yLevel][xLevel]
-				if otherBlock != nil && block.UniqueId() != otherBlock.UniqueId() {
-					if otherBlock.Collides(newX, newY, block.width, block.height) {
-						if otherBlock.Collides(newX, block.posY, block.width, block.height) {
-							if block.speedX > 0 {
-								newX = otherBlock.posX - block.width
-							} else {
-								newX = otherBlock.posX + otherBlock.width
-							}
-							collidesH = true
-						}
-						if otherBlock.Collides(block.posX, newY, block.width, block.height) {
-							if block.speedY > 0 {
-								newY = otherBlock.posY - block.height
-							} else {
-								newY = otherBlock.posY + otherBlock.height
-							}
-							collidesV = true
-						}
-					}
-				}
-			}
-		}
-		if collidesV {
+		if collisionInfo.collidesV {
 			block.speedY = 0
 		}
-		if collidesH {
+		if collisionInfo.collidesH {
 			block.speedX = 0
 		}
-		block.posX = newX
-		block.posY = newY
+		block.posX = collisionInfo.suggestedX
+		block.posY = collisionInfo.suggestedY
 	}
 }

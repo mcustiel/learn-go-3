@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	fmt.Println("Hello world")
+	fmt.Println("Starting game")
 	game := factory.CreateGameLogic()
 	game.Play()
 }

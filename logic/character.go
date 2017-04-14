@@ -29,71 +29,23 @@ func initCharacter() *Character {
 	character.width = BLOCK_WIDTH_PIXELS
 	character.height = BLOCK_HEIGHT_PIXELS
 	character.friction = 0
+	character.solid = true
 	return character
 }
 
-func applyCharacterLogic(game *Game) {
+func characterDiesAfterAction(game *Game) bool {
 	game.character.speedX = AccelerateX(game.character)
 	game.character.speedY = AccelerateY(game.character)
-
-	var newX, newY int = GetNewPosition(game.character)
-	if newX < 0 {
-		newX = 0
-	} else if newX > LOGICAL_WIDTH*BLOCK_WIDTH_PIXELS {
-		newX = (LOGICAL_WIDTH * BLOCK_WIDTH_PIXELS) - game.character.width
-	}
-	if newY < 0 {
-		newY = 0
-	} else if newY > LOGICAL_HEIGHT*BLOCK_HEIGHT_PIXELS {
-		newX = (LOGICAL_HEIGHT * BLOCK_HEIGHT_PIXELS) - game.character.height
-	}
-
-	var collidingBlocks map[int]*Block = make(map[int]*Block)
-	var collisionsFound int = 0
-	var collidesH, collidesV bool = false, false
-
-	for xLevel := 0; xLevel < LOGICAL_WIDTH; xLevel++ {
-		for yLevel := 0; yLevel < LOGICAL_HEIGHT; yLevel++ {
-			block := game.level[yLevel][xLevel]
-			if block != nil && block.Collides(newX, newY, game.character.width, game.character.height) {
-				println("Character collides with block ", block.id, block.posY)
-				collidingBlocks[collisionsFound] = block
-
-				if block.Collides(newX, game.character.posY, game.character.width, game.character.height) {
-					if game.character.speedX > 0 {
-						newX = block.posX - game.character.width
-					} else {
-						newX = block.posX + block.width
-					}
-					collidesH = true
-				}
-				if block.Collides(game.character.posX, newY, game.character.width, game.character.height) {
-					if game.character.speedY > 0 {
-						newY = block.posY - game.character.height
-					} else {
-						newY = block.posY + block.height
-					}
-					collidesV = true
-				}
-
-				collisionsFound++
-			}
-		}
-	}
-
-	if collidesV {
-		println("Collides vertically")
+	var collisionInfo CollisionInformation = GetCollisionInformation(game.character.Entity, game.level)
+	if collisionInfo.collidesV {
 		game.character.speedY = 0
 		game.character.jumping = false
 	}
-	if collidesH {
-		println("Collides horizontally")
+	if collisionInfo.collidesH {
 		game.character.speedX = 0
 	}
+	game.character.posX = collisionInfo.suggestedX
+	game.character.posY = collisionInfo.suggestedY
 
-	println("Character new position ", newX, newY)
-
-	game.character.posX = newX
-	game.character.posY = newY
-
+	return collisionInfo.collidesH || collisionInfo.collidesV
 }

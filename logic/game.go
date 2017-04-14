@@ -34,36 +34,31 @@ func (game Game) Play() {
 			running = false
 		}
 		game.applyInput(inputState)
-		game.applyLogic()
+		if game.applyActionAndGetResult() {
+			running = false
+		}
 		game.render()
 	}
 	game.renderer.Terminate()
 }
 
 func initRenderer(renderer render.Renderer) {
-	err := renderer.Init(LOGICAL_WIDTH * BLOCK_WIDTH_PIXELS)
+	err := renderer.Init(WORLD_WIDTH)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to create window: %s\n", err)
 		panic(err)
 	}
 }
 
-func (game *Game) applyLogic() {
-	applyCharacterLogic(game)
-	println("Character speedY", game.character.speedY)
+func (game *Game) applyActionAndGetResult() bool {
+	if characterDiesAfterAction(game) && false {
+		return true
+	}
 	applyLevelLogic(game)
-
-	//	for i := 0; i < collisionsFound; i++ {
-	//		switch (collidingTypes[i]) {
-	//		}
-	//	}
-
+	return false
 }
 
 func (game *Game) applyInput(gameInput input.InputStateAccessor) {
-	if gameInput.JumpPressed() {
-		println("JumpPressed")
-	}
 	if gameInput.JumpPressed() && !game.character.isJumping() {
 		game.character.speedY = -20
 		game.character.jumping = true

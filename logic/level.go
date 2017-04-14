@@ -4,6 +4,8 @@ import "sync"
 
 const LOGICAL_WIDTH = 100
 const LOGICAL_HEIGHT = 12
+const WORLD_WIDTH = 2000
+const WORLD_HEIGHT = 600
 
 type Level [][]*Block
 
@@ -26,7 +28,7 @@ func initLevel() Level {
 		object.speedY = 0
 		object.width = BLOCK_WIDTH_PIXELS
 		object.height = BLOCK_HEIGHT_PIXELS
-
+		object.solid = true
 		level[LOGICAL_HEIGHT-1][i] = object
 	}
 
@@ -43,7 +45,7 @@ func initLevel() Level {
 		object.speedY = 0
 		object.width = BLOCK_WIDTH_PIXELS
 		object.height = BLOCK_HEIGHT_PIXELS
-
+		object.solid = true
 		level[0][i] = object
 	}
 
