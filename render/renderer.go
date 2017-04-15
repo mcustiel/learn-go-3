@@ -1,7 +1,7 @@
 package render
 
 const WINDOW_TITLE string = "Learning Go/SDL"
-const WINDOWS_WIDTH, WINDOWS_HEIGHT int = 832, 640
+const WINDOWS_WIDTH, WINDOWS_HEIGHT int = 800, 600
 const FRAME_RATE int = 48
 
 type Renderer interface {

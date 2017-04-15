@@ -10,7 +10,7 @@ import (
 
 type SdlObject struct {
 	sdlRect *sdl.Rect
-	sprite  *SdlSprite
+	sprite  *Sprite
 }
 
 type SdlObjects map[int]*SdlObject
@@ -27,22 +27,6 @@ type SdlScreen struct {
 	xPos    int
 	yPos    int
 	display *SdlDisplay
-}
-
-type Frame struct {
-	x int32
-	y int32
-	w int32
-	h int32
-}
-
-type SdlSprite struct {
-	frames  []Frame
-	current int
-}
-
-func (sprite *SdlSprite) advance() {
-	sprite.current = (sprite.current + 1) % len(sprite.frames)
 }
 
 func NewSdlRenderer() *SdlDisplay {
@@ -74,45 +58,18 @@ func (screen SdlScreen) End() {
 }
 
 func (screen SdlScreen) Draw(renderable Renderable) {
-	if renderable.PositionX() > screen.xPos+WINDOWS_WIDTH {
-		return
-	}
-	if renderable.PositionX()+renderable.Width() < screen.xPos {
+	if screen.isOutOfTheScreen(renderable) {
 		return
 	}
 
-	isPlayer := renderable.UniqueId() == -1
+	sdlObject := screen.getSdlObjectToDraw(renderable)
+	sdlObject.sdlRect.X = int32(renderable.PositionX() - screen.xPos)
+	sdlObject.sdlRect.Y = int32(renderable.PositionY())
 
-	if screen.display.sdlObjects[renderable.UniqueId()] == nil {
-		screen.display.sdlObjects[renderable.UniqueId()] = new(SdlObject)
-	}
-	sdlObject := screen.display.sdlObjects[renderable.UniqueId()]
-	if sdlObject.sdlRect == nil {
-		if isPlayer {
-			println("Player data was not set, creating rect")
-		}
-		rect := sdl.Rect{int32(renderable.PositionX() - screen.xPos),
-			int32(renderable.PositionY()),
-			int32(renderable.Width()),
-			int32(renderable.Height())}
-		sdlObject.sdlRect = &rect
-	} else {
-		if isPlayer {
-			println("Player data was set. Updating rect")
-		}
-		sdlObject.sdlRect.X = int32(renderable.PositionX() - screen.xPos)
-		sdlObject.sdlRect.Y = int32(renderable.PositionY())
-	}
 	if sdlObject.sprite == nil {
-		if isPlayer {
-			println("Player does not have sprite. Drawing rect")
-		}
 		screen.display.renderer.SetDrawColor(255, 245, 235, 255)
 		screen.display.renderer.DrawRect(sdlObject.sdlRect)
 	} else {
-		if isPlayer {
-			println("Player does have sprite. Copying.")
-		}
 		dest := sdl.Rect{
 			sdlObject.sprite.frames[sdlObject.sprite.current].x,
 			sdlObject.sprite.frames[sdlObject.sprite.current].y,
@@ -121,7 +78,6 @@ func (screen SdlScreen) Draw(renderable Renderable) {
 		}
 		sdlObject.sprite.advance()
 		screen.display.renderer.Copy(screen.display.spritesheet, &dest, sdlObject.sdlRect)
-
 	}
 }
 
@@ -166,7 +122,7 @@ func (display *SdlDisplay) Init(worldWidth int) error {
 	frame[3] = Frame{713, 157, 49, 45}
 	frame[4] = Frame{585, 779, 64, 40}
 	display.sdlObjects[-1] = new(SdlObject)
-	display.sdlObjects[-1].sprite = &SdlSprite{frame, 0}
+	display.sdlObjects[-1].sprite = &Sprite{frame, 0, true}
 
 	return err
 }
@@ -175,4 +131,24 @@ func (display *SdlDisplay) Terminate() {
 	display.spritesheet.Destroy()
 	display.renderer.Destroy()
 	display.window.Destroy()
+}
+
+func (screen SdlScreen) getSdlObjectToDraw(renderable Renderable) *SdlObject {
+	if screen.display.sdlObjects[renderable.UniqueId()] == nil {
+		screen.display.sdlObjects[renderable.UniqueId()] = new(SdlObject)
+	}
+	sdlObject := screen.display.sdlObjects[renderable.UniqueId()]
+	if sdlObject.sdlRect == nil {
+		rect := sdl.Rect{int32(renderable.PositionX() - screen.xPos),
+			int32(renderable.PositionY()),
+			int32(renderable.Width()),
+			int32(renderable.Height())}
+		sdlObject.sdlRect = &rect
+	}
+	return sdlObject
+}
+
+func (screen SdlScreen) isOutOfTheScreen(renderable Renderable) bool {
+	return renderable.PositionX() > screen.xPos+WINDOWS_WIDTH ||
+		renderable.PositionX()+renderable.Width() < screen.xPos
 }
