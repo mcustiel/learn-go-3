@@ -54,30 +54,31 @@ func (screen SdlScreen) Start() {
 
 func (screen SdlScreen) End() {
 	screen.display.renderer.Present()
-	sdl.Delay(uint32(1000 / FRAME_RATE))
 }
 
-func (screen SdlScreen) Draw(renderable Renderable) {
+func (screen SdlScreen) Draw(renderable Renderable, sprite animation.Sprite) {
 	if screen.isOutOfTheScreen(renderable) {
 		return
 	}
 
-	sdlObject := screen.getSdlObjectToDraw(renderable)
-	sdlObject.sdlRect.X = int32(renderable.PositionX() - screen.xPos)
-	sdlObject.sdlRect.Y = int32(renderable.PositionY())
+	screenPos := sdl.Rect{
+		int32(renderable.PositionX() - screen.xPos)
+		int32(renderable.PositionY())
+		int32(renderable.Width())
+		int32(renderable.Height())
+	}
 
 	if sdlObject.sprite == nil {
 		screen.display.renderer.SetDrawColor(255, 245, 235, 255)
-		screen.display.renderer.DrawRect(sdlObject.sdlRect)
+		screen.display.renderer.DrawRect(&screenPos)
 	} else {
-		dest := sdl.Rect{
-			sdlObject.sprite.frames[sdlObject.sprite.current].x,
-			sdlObject.sprite.frames[sdlObject.sprite.current].y,
-			sdlObject.sprite.frames[sdlObject.sprite.current].w,
-			sdlObject.sprite.frames[sdlObject.sprite.current].h,
+		framePos := sdl.Rect{
+			sprite.Current().X()
+			sprite.Current().Y()
+			sprite.Current().W()
+			sprite.Current().H()
 		}
-		sdlObject.sprite.advance()
-		screen.display.renderer.Copy(screen.display.spritesheet, &dest, sdlObject.sdlRect)
+		screen.display.renderer.Copy(screen.display.spritesheet, &framePos, &screenPos)
 	}
 }
 
@@ -100,16 +101,8 @@ func (display *SdlDisplay) Init(worldWidth int) error {
 	if err != nil {
 		return err
 	}
-	image, err := img.Load("assets/spritesheet_complete.png")
+	display.spritesheet, err = loadAssets()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to load PNG: %s\n", err)
-		return err
-	}
-	defer image.Free()
-
-	display.spritesheet, err = display.renderer.CreateTextureFromSurface(image)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to create texture: %s\n", err)
 		return err
 	}
 
@@ -131,21 +124,6 @@ func (display *SdlDisplay) Terminate() {
 	display.spritesheet.Destroy()
 	display.renderer.Destroy()
 	display.window.Destroy()
-}
-
-func (screen SdlScreen) getSdlObjectToDraw(renderable Renderable) *SdlObject {
-	if screen.display.sdlObjects[renderable.UniqueId()] == nil {
-		screen.display.sdlObjects[renderable.UniqueId()] = new(SdlObject)
-	}
-	sdlObject := screen.display.sdlObjects[renderable.UniqueId()]
-	if sdlObject.sdlRect == nil {
-		rect := sdl.Rect{int32(renderable.PositionX() - screen.xPos),
-			int32(renderable.PositionY()),
-			int32(renderable.Width()),
-			int32(renderable.Height())}
-		sdlObject.sdlRect = &rect
-	}
-	return sdlObject
 }
 
 func (screen SdlScreen) isOutOfTheScreen(renderable Renderable) bool {
