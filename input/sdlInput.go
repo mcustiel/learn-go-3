@@ -9,15 +9,12 @@ func KeyboardState() *Input {
 	}
 	state := sdl.GetKeyboardState()
 	if state[sdl.SCANCODE_SPACE] == 1 {
-		println(state[sdl.SCANCODE_SPACE])
 		input.jump = true
 	}
 	if state[sdl.SCANCODE_RIGHT] == 1 {
-		println(state[sdl.SCANCODE_RIGHT])
 		input.right = true
 	}
 	if state[sdl.SCANCODE_LEFT] == 1 {
-		println(state[sdl.SCANCODE_LEFT])
 		input.left = true
 	}
 

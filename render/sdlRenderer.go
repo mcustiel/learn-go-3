@@ -1,25 +1,14 @@
 package render
 
 import (
-	"fmt"
-	"os"
-
+	"github.com/mcustiel/game/animation"
 	"github.com/veandco/go-sdl2/sdl"
-	"github.com/veandco/go-sdl2/sdl_image"
 )
-
-type SdlObject struct {
-	sdlRect *sdl.Rect
-	sprite  *Sprite
-}
-
-type SdlObjects map[int]*SdlObject
 
 type SdlDisplay struct {
 	window      *sdl.Window
 	renderer    *sdl.Renderer
 	spritesheet *sdl.Texture
-	sdlObjects  SdlObjects
 	worldWidth  int
 }
 
@@ -56,27 +45,27 @@ func (screen SdlScreen) End() {
 	screen.display.renderer.Present()
 }
 
-func (screen SdlScreen) Draw(renderable Renderable, sprite animation.Sprite) {
+func (screen SdlScreen) Draw(renderable Renderable, sprite *animation.Sprite) {
 	if screen.isOutOfTheScreen(renderable) {
 		return
 	}
 
 	screenPos := sdl.Rect{
-		int32(renderable.PositionX() - screen.xPos)
-		int32(renderable.PositionY())
-		int32(renderable.Width())
-		int32(renderable.Height())
+		int32(renderable.PositionX() - screen.xPos),
+		int32(renderable.PositionY()),
+		int32(renderable.Width()),
+		int32(renderable.Height()),
 	}
 
-	if sdlObject.sprite == nil {
+	if sprite == nil {
 		screen.display.renderer.SetDrawColor(255, 245, 235, 255)
 		screen.display.renderer.DrawRect(&screenPos)
 	} else {
 		framePos := sdl.Rect{
-			sprite.Current().X()
-			sprite.Current().Y()
-			sprite.Current().W()
-			sprite.Current().H()
+			sprite.Current().X,
+			sprite.Current().Y,
+			sprite.Current().W,
+			sprite.Current().H,
 		}
 		screen.display.renderer.Copy(screen.display.spritesheet, &framePos, &screenPos)
 	}
@@ -101,21 +90,10 @@ func (display *SdlDisplay) Init(worldWidth int) error {
 	if err != nil {
 		return err
 	}
-	display.spritesheet, err = loadAssets()
+	display.spritesheet, err = loadAssets(display.renderer)
 	if err != nil {
 		return err
 	}
-
-	display.sdlObjects = make(SdlObjects)
-
-	frame := make([]Frame, 5)
-	frame[0] = Frame{759, 812, 45, 54}
-	frame[1] = Frame{760, 380, 45, 54}
-	frame[2] = Frame{759, 503, 45, 52}
-	frame[3] = Frame{713, 157, 49, 45}
-	frame[4] = Frame{585, 779, 64, 40}
-	display.sdlObjects[-1] = new(SdlObject)
-	display.sdlObjects[-1].sprite = &Sprite{frame, 0, true}
 
 	return err
 }

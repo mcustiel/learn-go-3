@@ -9,16 +9,9 @@ type Renderer interface {
 	Terminate()
 }
 
-type Screen interface {
-	Start()
-	Draw(renderable Renderable)
-	End()
-}
-
 type Renderable interface {
 	PositionX() int
 	PositionY() int
 	Width() int
 	Height() int
-	Sprite() Sprite
 }

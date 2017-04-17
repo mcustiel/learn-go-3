@@ -1,8 +1,8 @@
 package logic
 
 const (
-	BLOCK_HEIGHT_PIXELS int = 50
-	BLOCK_WIDTH_PIXELS  int = 50
+	BLOCK_HEIGHT_PIXELS int = 64
+	BLOCK_WIDTH_PIXELS  int = 64
 )
 
 type BlockType int

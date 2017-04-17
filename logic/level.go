@@ -3,9 +3,9 @@ package logic
 import "sync"
 
 const LOGICAL_WIDTH = 100
-const LOGICAL_HEIGHT = 12
-const WORLD_WIDTH = 2000
-const WORLD_HEIGHT = 600
+const LOGICAL_HEIGHT = 10
+const WORLD_WIDTH = 6400
+const WORLD_HEIGHT = 640
 
 type Level [][]*Block
 

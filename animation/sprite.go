@@ -17,3 +17,7 @@ func (sprite *Sprite) Advance() {
 func (sprite Sprite) Current() Rectangle {
 	return sprite.framesInSheet[sprite.currentFrame]
 }
+
+func NewSprite(frames []Rectangle) *Sprite {
+	return &Sprite{frames, 0, true}
+}

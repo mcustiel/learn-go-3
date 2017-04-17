@@ -1,33 +1,68 @@
 package logic
 
-use anim "animation"
+import (
+	"github.com/mcustiel/game/animation"
+)
 
-type Sprites map[byte]anim.Sprite
+const (
+	CHARACTER_WALKING  byte = 1
+	CHARACTER_STANDING byte = 2
+	CHARACTER_JUMPING  byte = 3
+	BLOCK_GROUND       byte = 4
+	FALLING_BLOCK      byte = 5
+)
 
-func (sprites Sprites) Get(code byte) anim.Sprite {
+type Sprites map[byte]*animation.Sprite
+
+func (sprites Sprites) Get(code byte) *animation.Sprite {
 	return sprites[code]
 }
 
-func InitSprites () map[byte]anim.Sprite {
-	var sprites map[byte]anim.Sprite := make(map[byte]anim.Sprite)
-	
-	frame := make([]anim.Frame, 5)
-	frame[0] = anim.Frame{759, 812, 45, 54}
-	frame[1] = anim.Frame{760, 380, 45, 54}
-	frame[2] = anim.Frame{759, 503, 45, 52}
-	frame[3] = anim.Frame{713, 157, 49, 45}
-	frame[4] = anim.Frame{585, 779, 64, 40}
-	
-	sprites['c'] = frame 
+func InitSprites() Sprites {
+	var sprites Sprites = make(Sprites)
+
+	sprites[CHARACTER_WALKING] = getCharacterWalkingSprite()
+	sprites[CHARACTER_STANDING] = getCharacterStandingSprite()
+	sprites[CHARACTER_JUMPING] = getCharacterJumpingSprite()
+	sprites[BLOCK_GROUND] = getGroundSprite()
+	sprites[FALLING_BLOCK] = getFallingBlockSprite()
+
+	return sprites
 }
 
-func getCharacterSprite() anim.Sprite {
-	frame := make([]anim.Frame, 5)
-	frame[0] = anim.Frame{759, 812, 45, 54}
-	frame[1] = anim.Frame{760, 380, 45, 54}
-	frame[2] = anim.Frame{759, 503, 45, 52}
-	frame[3] = anim.Frame{713, 157, 49, 45}
-	frame[4] = anim.Frame{585, 779, 64, 40}
-	
-	return anim.Sprite{frame, 0, true}
+func getCharacterJumpingSprite() *animation.Sprite {
+	frame := make([]animation.Rectangle, 2)
+	frame[0] = animation.Rectangle{805, 545, 44, 53}
+	frame[1] = animation.Rectangle{764, 0, 44, 54}
+
+	return animation.NewSprite(frame)
+}
+
+func getCharacterWalkingSprite() *animation.Sprite {
+	frame := make([]animation.Rectangle, 5)
+	frame[0] = animation.Rectangle{759, 812, 45, 54}
+	frame[1] = animation.Rectangle{760, 380, 45, 54}
+	frame[2] = animation.Rectangle{759, 503, 45, 52}
+	frame[3] = animation.Rectangle{713, 157, 49, 45}
+	frame[4] = animation.Rectangle{585, 779, 64, 40}
+
+	return animation.NewSprite(frame)
+}
+
+func getGroundSprite() *animation.Sprite {
+	frame := make([]animation.Rectangle, 1)
+	frame[0] = animation.Rectangle{520, 0, 64, 64}
+	return animation.NewSprite(frame)
+}
+
+func getFallingBlockSprite() *animation.Sprite {
+	frame := make([]animation.Rectangle, 1)
+	frame[0] = animation.Rectangle{455, 914, 64, 64}
+	return animation.NewSprite(frame)
+}
+
+func getCharacterStandingSprite() *animation.Sprite {
+	frame := make([]animation.Rectangle, 1)
+	frame[0] = animation.Rectangle{762, 203, 45, 54}
+	return animation.NewSprite(frame)
 }
