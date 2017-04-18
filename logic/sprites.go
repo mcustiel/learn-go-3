@@ -8,8 +8,9 @@ const (
 	CHARACTER_WALKING  byte = 1
 	CHARACTER_STANDING byte = 2
 	CHARACTER_JUMPING  byte = 3
-	BLOCK_GROUND       byte = 4
-	FALLING_BLOCK      byte = 5
+	GROUND             byte = 4
+	FALLING_ROCK       byte = 5
+	ROCK               byte = 6
 )
 
 type Sprites map[byte]*animation.Sprite
@@ -24,8 +25,9 @@ func InitSprites() Sprites {
 	sprites[CHARACTER_WALKING] = getCharacterWalkingSprite()
 	sprites[CHARACTER_STANDING] = getCharacterStandingSprite()
 	sprites[CHARACTER_JUMPING] = getCharacterJumpingSprite()
-	sprites[BLOCK_GROUND] = getGroundSprite()
-	sprites[FALLING_BLOCK] = getFallingBlockSprite()
+	sprites[GROUND] = getGroundSprite()
+	sprites[FALLING_ROCK] = getFallingBlockSprite()
+	sprites[ROCK] = getRockSprite()
 
 	return sprites
 }
@@ -58,6 +60,12 @@ func getGroundSprite() *animation.Sprite {
 func getFallingBlockSprite() *animation.Sprite {
 	frame := make([]animation.Rectangle, 1)
 	frame[0] = animation.Rectangle{455, 914, 64, 64}
+	return animation.NewSprite(frame)
+}
+
+func getRockSprite() *animation.Sprite {
+	frame := make([]animation.Rectangle, 1)
+	frame[0] = animation.Rectangle{455, 849, 64, 64}
 	return animation.NewSprite(frame)
 }
 

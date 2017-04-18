@@ -61,8 +61,8 @@ func (object Entity) GetNextX() int {
 	var newX int = object.posX + object.speedX
 	if newX < 0 {
 		newX = 0
-	} else if newX > LOGICAL_WIDTH*BLOCK_WIDTH_PIXELS-object.width {
-		newX = (LOGICAL_WIDTH * BLOCK_WIDTH_PIXELS) - object.width
+	} else if newX > WORLD_WIDTH-object.width {
+		newX = WORLD_WIDTH - object.width
 	}
 	return newX
 }
@@ -71,8 +71,8 @@ func (object Entity) GetNextY() int {
 	var newY int = object.posY + object.speedY
 	if newY < 0 {
 		newY = 0
-	} else if newY > LOGICAL_HEIGHT*BLOCK_HEIGHT_PIXELS-object.height {
-		newY = (LOGICAL_HEIGHT * BLOCK_HEIGHT_PIXELS) - object.height
+	} else if newY > WORLD_HEIGHT-object.height {
+		newY = WORLD_HEIGHT - object.height
 	}
 	return newY
 }

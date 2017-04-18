@@ -14,6 +14,7 @@ const (
 	BLOCK_TYPE_UNDERGROUND   BlockType = 3
 	BLOCK_TYPE_UNDERWATER    BlockType = 4
 	BLOCK_TYPE_WATER_SURFACE BlockType = 5
+	BLOCK_TYPE_ROCK          BlockType = 6
 )
 
 type Block struct {

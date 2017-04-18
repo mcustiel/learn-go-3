@@ -58,22 +58,21 @@ func GetCollisionInformation(object Entity, level Level) CollisionInformation {
 	var block *Block
 	var collidingBlocks map[int]*Block = make(map[int]*Block)
 	var collisionsFound int = 0
-	for xLevel := 0; xLevel < LOGICAL_WIDTH; xLevel++ {
-		for yLevel := 0; yLevel < LOGICAL_HEIGHT; yLevel++ {
-			block = level[yLevel][xLevel]
-			if block != nil && block.Entity != object && block.solid && block.Collides(newX, newY, object.width, object.height) {
-				collidingBlocks[collisionsFound] = block
-				collisionsFound++
-				if block.Collides(newX, object.posY, object.width, object.height) {
-					newX = object.GetHorizontalPositionNextTo(block.Entity)
-					collidesH = true
-				}
-				if block.Collides(object.posX, newY, object.width, object.height) {
-					newY = object.GetVerticalPositionNextTo(block.Entity)
-					collidesV = true
-				}
+	for iterator := level.Iterator(); iterator.HasNext(); iterator.Next() {
+		block = iterator.Get()
+		if block != nil && block.Entity != object && block.solid && block.Collides(newX, newY, object.width, object.height) {
+			collidingBlocks[collisionsFound] = block
+			collisionsFound++
+			if block.Collides(newX, object.posY, object.width, object.height) {
+				newX = object.GetHorizontalPositionNextTo(block.Entity)
+				collidesH = true
+			}
+			if block.Collides(object.posX, newY, object.width, object.height) {
+				newY = object.GetVerticalPositionNextTo(block.Entity)
+				collidesV = true
 			}
 		}
 	}
+
 	return CollisionInformation{collidingBlocks, collidesH, collidesV, newX, newY}
 }

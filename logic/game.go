@@ -20,8 +20,11 @@ type Game struct {
 }
 
 func NewGame(renderer render.Renderer, timer timing.FrameRateController) *Game {
+	level := NewLevel()
+	initLevel(level)
+
 	game := new(Game)
-	game.level = initLevel()
+	game.level = level
 	game.character = initCharacter()
 	game.renderer = renderer
 	game.sprites = InitSprites()
@@ -73,12 +76,19 @@ func (game *Game) applyInput(gameInput input.InputStateAccessor) {
 		game.character.jumping = true
 	}
 	if gameInput.LeftPressed() {
-		game.character.speedX = -4
+		if game.character.jumping {
+			game.character.speedX = -6
+		} else {
+			game.character.speedX = -4
+		}
+	} else if gameInput.RightPressed() {
+		if game.character.jumping {
+			game.character.speedX = 6
+		} else {
+			game.character.speedX = 4
+		}
 	} else {
 		game.character.speedX = 0
-	}
-	if gameInput.RightPressed() {
-		game.character.speedX = 4
 	}
 }
 
@@ -86,14 +96,13 @@ func (game Game) render() {
 	screen := game.renderer.Screen(game.character.posX)
 	screen.Start()
 	var sprite *animation.Sprite
-	for xLevel := 0; xLevel < LOGICAL_WIDTH; xLevel++ {
-		for yLevel := 0; yLevel < LOGICAL_HEIGHT; yLevel++ {
-			block := game.level[yLevel][xLevel]
-			if block != nil {
-				sprite = game.sprites.Get(getBlockSpriteCode(block))
-				screen.Draw(block, sprite)
-				sprite.Advance()
-			}
+
+	for iterator := game.level.Iterator(); iterator.HasNext(); iterator.Next() {
+		block := iterator.Get()
+		if block != nil {
+			sprite = game.sprites.Get(getBlockSpriteCode(block))
+			screen.Draw(block, sprite)
+			sprite.Advance()
 		}
 	}
 	sprite = game.sprites.Get(getCharacterSpriteCode(game.character))
@@ -105,9 +114,11 @@ func (game Game) render() {
 func getBlockSpriteCode(block *Block) byte {
 	var code byte
 	if BlockType(block.Type()) == BLOCK_TYPE_FALLING_ROCK {
-		code = FALLING_BLOCK
+		code = FALLING_ROCK
+	} else if BlockType(block.Type()) == BLOCK_TYPE_ROCK {
+		code = ROCK
 	} else if BlockType(block.Type()) == BLOCK_TYPE_FLOOR {
-		code = BLOCK_GROUND
+		code = GROUND
 	}
 	return code
 }
